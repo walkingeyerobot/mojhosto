@@ -12,6 +12,6 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="30dp"
         android:onClick="onGoFuckYourself"
-        android:text="forest bear" />
+        android:text="pheldy" />
 
 </RelativeLayout>
