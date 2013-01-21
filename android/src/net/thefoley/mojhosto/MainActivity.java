@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
     			socket.connect();
     			if (socket.isConnected()) {
     				System.out.println("true!");
-    				final InputStream is = getResources().getAssets().open("forestbear");
+    				final InputStream is = getResources().getAssets().open("pheldy");
     				byte[] byteArray = new byte[4000];
     				ByteArrayOutputStream baos = new ByteArrayOutputStream();
     				while(true) {
