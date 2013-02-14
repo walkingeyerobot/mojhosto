@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.app.Activity;
@@ -31,47 +32,77 @@ public class MainActivity extends Activity {
         return true;
     }
     
-    public void onGoFuckYourself(View v) throws IOException {
-    	System.out.println("double quotes");
-    	BluetoothAdapter bluetube = BluetoothAdapter.getDefaultAdapter();
-    	Set<BluetoothDevice> pairedDevices = bluetube.getBondedDevices();
-    	System.out.println("wat");
-    	for (BluetoothDevice foo:pairedDevices) {
-    		if (foo.getName().equals("Star Micronics")) {
-    			System.out.println("found it.");
-    			ParcelUuid[] pu = foo.getUuids();
-    			UUID uuid = pu[0].getUuid();
-    			BluetoothSocket socket = foo.createInsecureRfcommSocketToServiceRecord(uuid);
-    			socket.connect();
-    			if (socket.isConnected()) {
-    				System.out.println("true!");
-    				final InputStream is = getResources().getAssets().open("pheldy");
-    				byte[] byteArray = new byte[4000];
-    				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    				while(true) {
-    					int i = is.read(byteArray);
-    					if (i == -1) {
-    						break;
-    					}
-    					baos.write(byteArray, 0, i);
-    				}
-    				is.close();
-    				baos.write('\n');
-    				byte[] bytes = baos.toByteArray();
-    				System.out.println(bytes.length - 1);
-    				baos.close();
-    				
-    				OutputStream out = socket.getOutputStream();
-    				//String str = "hello world\n\n\n\n\n";
-    				//out.write(str.getBytes(Charset.forName("LATIN-1")));
-    				out.write(bytes);
-    				out.close();
-    				socket.close();
-    			} else {
-    				System.out.println("false!");
-    			}
-    			break;
-    		}
+    private class Pheldy extends AsyncTask<ByteArrayOutputStream, Integer, Long> {
+    	protected void onPostExecute(Long result) {
+    		
     	}
+    	protected void onProgressUpdate(Long... progress) {
+    		
+    	}
+		protected Long doInBackground(ByteArrayOutputStream... baoses) {
+			try {
+				ByteArrayOutputStream baos = baoses[0];
+				BluetoothAdapter bluetube = BluetoothAdapter.getDefaultAdapter();
+				Set<BluetoothDevice> pairedDevices = bluetube.getBondedDevices();
+				for (BluetoothDevice device:pairedDevices) {
+					// TODO(mitch): Make this a better comparison
+					if (device.getName().equals("Star Micronics")) {
+						System.out.println("found it.");
+						if (device.fetchUuidsWithSdp()) {
+							System.out.println("true");
+						} else {
+							System.out.println("false");
+						}
+						ParcelUuid[] pu = device.getUuids();
+						UUID uuid = pu[0].getUuid(); //02-10 19:57:16.348: I/System.out(8924): 00001101-0000-1000-8000-00805f9b34fb
+						BluetoothSocket socket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+						socket.connect();
+						if (socket.isConnected()) {
+							System.out.println("connected.");
+							byte[] bytes = baos.toByteArray();
+							System.out.println(bytes.length);
+							baos.close();
+							OutputStream out = socket.getOutputStream();
+							int start = 0;
+							int len = 1000;
+							while(true) {
+								out.write(bytes, 0, len);
+								start += len;
+								if (start >= bytes.length) {
+									break;
+								} else if (start + len > bytes.length){
+									len = bytes.length - start;
+								}
+							}
+							out.close();
+							socket.close();
+							System.out.println("closed");
+						} else {
+							System.out.println("can't connect.");
+						}
+						break;
+					}
+				}
+			} catch (IOException e) {
+				System.out.println("exception.");
+			}
+			return null;
+		}
+    }
+    
+    public void onGoFuckYourself(View v) throws IOException {
+    	System.out.println("button pressed");
+		final InputStream is = getResources().getAssets().open("pheldy");
+		byte[] byteArray = new byte[1376];
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		while(true) {
+			int i = is.read(byteArray);
+			if (i == -1) {
+				break;
+			}
+			baos.write(byteArray, 0, i);
+		}
+		is.close();
+    	new Pheldy().execute(baos);
     }
 }
