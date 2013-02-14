@@ -16,6 +16,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.view.Menu;
 import android.view.View;
+import android.widget.SlidingDrawer;
 
 public class MainActivity extends Activity {
 
@@ -32,7 +33,7 @@ public class MainActivity extends Activity {
         return true;
     }
     
-    private class Pheldy extends AsyncTask<ByteArrayOutputStream, Integer, Long> {
+    private class Pheldy extends AsyncTask<ByteArrayOutputStream, Long, Long> {
     	protected void onPostExecute(Long result) {
     		
     	}
@@ -48,13 +49,19 @@ public class MainActivity extends Activity {
 					// TODO(mitch): Make this a better comparison
 					if (device.getName().equals("Star Micronics")) {
 						System.out.println("found it.");
-						if (device.fetchUuidsWithSdp()) {
+						/* this code caches the UUIDs, but doesn't return them. This code doesn't block.
+						 if (device.fetchUuidsWithSdp()) {
 							System.out.println("true");
 						} else {
 							System.out.println("false");
 						}
-						ParcelUuid[] pu = device.getUuids();
-						UUID uuid = pu[0].getUuid(); //02-10 19:57:16.348: I/System.out(8924): 00001101-0000-1000-8000-00805f9b34fb
+						*/
+						// this code reads the UUIDs from cache.
+						// I think the UUIDs for a given device never change, so I read it once and I think we can use
+						// a hardcoded string now. Which is way more stable.
+						//ParcelUuid[] pu = device.getUuids();
+						//UUID uuid = pu[0].getUuid();
+						UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 						BluetoothSocket socket = device.createInsecureRfcommSocketToServiceRecord(uuid);
 						socket.connect();
 						if (socket.isConnected()) {
@@ -64,9 +71,17 @@ public class MainActivity extends Activity {
 							baos.close();
 							OutputStream out = socket.getOutputStream();
 							int start = 0;
-							int len = 1000;
+							int len = 1024;
+							int sleep = 0;
+							if (len > bytes.length) {
+								len = bytes.length;
+							}
 							while(true) {
-								out.write(bytes, 0, len);
+								out.write(bytes, start, len);
+								if (sleep > 0) {
+									System.out.println("sleeping...");
+									Thread.sleep(sleep);
+								}
 								start += len;
 								if (start >= bytes.length) {
 									break;
@@ -84,7 +99,9 @@ public class MainActivity extends Activity {
 					}
 				}
 			} catch (IOException e) {
-				System.out.println("exception.");
+				System.out.println("exception: " + e.getMessage());
+			} catch (InterruptedException e) {
+				System.out.println("exception: " + e.getMessage());
 			}
 			return null;
 		}
@@ -92,8 +109,8 @@ public class MainActivity extends Activity {
     
     public void onGoFuckYourself(View v) throws IOException {
     	System.out.println("button pressed");
-		final InputStream is = getResources().getAssets().open("pheldy");
-		byte[] byteArray = new byte[1376];
+		final InputStream is = getResources().getAssets().open("fixedbear.raw");
+		byte[] byteArray = new byte[1024];
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		while(true) {
 			int i = is.read(byteArray);
