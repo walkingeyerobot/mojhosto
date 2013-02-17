@@ -9,12 +9,12 @@ import java.util.UUID;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.view.Menu;
-import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -23,10 +23,39 @@ import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
 
+  @SuppressLint("SetJavaScriptEnabled")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    WebView webview = (WebView) findViewById(R.id.webView1);
+    webview.setWebViewClient(new WebViewClient());
+    webview.setWebChromeClient(new WebChromeClient() {
+      @Override
+      public void onExceededDatabaseQuota(
+          String url,
+          String databaseIdentifier,
+          long currentQuota,
+          long estimatedSize,
+          long totalUsedQuota,
+          android.webkit.WebStorage.QuotaUpdater quotaUpdater) {
+        quotaUpdater.updateQuota(estimatedSize * 2);
+      }
+    });
+    WebSettings settings = webview.getSettings();
+    settings.setJavaScriptEnabled(true);
+    settings.setDatabaseEnabled(true);
+    settings.setDomStorageEnabled(true);
+    settings.setDatabasePath("/data/data/net.thefoley.mojhosto/database");
+    settings.setAppCacheMaxSize(1024*1024*8); // 8mb
+    String appCachePath =
+        getApplicationContext().getCacheDir().getAbsolutePath();
+    settings.setAppCachePath(appCachePath);
+    settings.setAllowFileAccess(true);
+    settings.setAppCacheEnabled(true);
+    settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+    webview.addJavascriptInterface(new JsObject(), "injectedObject");
+    webview.loadUrl("http://thefoley.net/mojhosto/index.html");
   }
 
   @Override
@@ -37,9 +66,11 @@ public class MainActivity extends Activity {
   }
   
   private class JsObject {
+    @SuppressWarnings("unused")
     @JavascriptInterface
-    public String toString() {
-      return "buttz";
+    public void printCard() throws IOException {
+      System.out.println("loading file and printing...");
+      loadFileAndPrint();
     }
   }
 
@@ -123,9 +154,8 @@ public class MainActivity extends Activity {
       return null;
     }
   }
-
-  public void onGoFuckYourself(View v) throws IOException {
-    System.out.println("button pressed");
+  
+  public void loadFileAndPrint() throws IOException {
     final InputStream is = getResources().getAssets().open("pheldy2");
     byte[] byteArray = new byte[1024];
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -138,37 +168,5 @@ public class MainActivity extends Activity {
     }
     is.close();
     new Pheldy().execute(baos);
-  }
-
-  public void onWebView(View v) {
-    WebView webview = new WebView(this);
-    webview.setWebViewClient(new WebViewClient());
-    webview.setWebChromeClient(new WebChromeClient() {
-      @Override
-      public void onExceededDatabaseQuota(
-          String url,
-          String databaseIdentifier,
-          long currentQuota,
-          long estimatedSize,
-          long totalUsedQuota,
-          android.webkit.WebStorage.QuotaUpdater quotaUpdater) {
-        quotaUpdater.updateQuota(estimatedSize * 2);
-      }
-    });
-    WebSettings settings = webview.getSettings();
-    settings.setJavaScriptEnabled(true);
-    settings.setDatabaseEnabled(true);
-    settings.setDomStorageEnabled(true);
-    settings.setDatabasePath("/data/data/net.thefoley.mojhosto/database");
-    settings.setAppCacheMaxSize(1024*1024*8); // 8mb
-    String appCachePath =
-        getApplicationContext().getCacheDir().getAbsolutePath();
-    settings.setAppCachePath(appCachePath);
-    settings.setAllowFileAccess(true);
-    settings.setAppCacheEnabled(true);
-    settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-    webview.addJavascriptInterface(new JsObject(), "injectedObject");
-    // TODO(mitch): actually write a page for this to load.
-    // webview.loadUrl();
   }
 }
