@@ -15,6 +15,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.view.Menu;
 import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
 
@@ -29,6 +34,13 @@ public class MainActivity extends Activity {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.activity_main, menu);
     return true;
+  }
+  
+  private class JsObject {
+    @JavascriptInterface
+    public String toString() {
+      return "buttz";
+    }
   }
 
   private class Pheldy extends AsyncTask<ByteArrayOutputStream, Long, Long> {
@@ -126,5 +138,37 @@ public class MainActivity extends Activity {
     }
     is.close();
     new Pheldy().execute(baos);
+  }
+
+  public void onWebView(View v) {
+    WebView webview = new WebView(this);
+    webview.setWebViewClient(new WebViewClient());
+    webview.setWebChromeClient(new WebChromeClient() {
+      @Override
+      public void onExceededDatabaseQuota(
+          String url,
+          String databaseIdentifier,
+          long currentQuota,
+          long estimatedSize,
+          long totalUsedQuota,
+          android.webkit.WebStorage.QuotaUpdater quotaUpdater) {
+        quotaUpdater.updateQuota(estimatedSize * 2);
+      }
+    });
+    WebSettings settings = webview.getSettings();
+    settings.setJavaScriptEnabled(true);
+    settings.setDatabaseEnabled(true);
+    settings.setDomStorageEnabled(true);
+    settings.setDatabasePath("/data/data/net.thefoley.mojhosto/database");
+    settings.setAppCacheMaxSize(1024*1024*8); // 8mb
+    String appCachePath =
+        getApplicationContext().getCacheDir().getAbsolutePath();
+    settings.setAppCachePath(appCachePath);
+    settings.setAllowFileAccess(true);
+    settings.setAppCacheEnabled(true);
+    settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+    webview.addJavascriptInterface(new JsObject(), "injectedObject");
+    // TODO(mitch): actually write a page for this to load.
+    // webview.loadUrl();
   }
 }
