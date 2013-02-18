@@ -1,5 +1,7 @@
 CACHE MANIFEST
-# version 0
+# change the version number to force the browser or webview to reload the app.
+# otherwise it will just continue to load from cache.
+# version 1
 jquery.js
 mojhosto.css
 mojhosto.js
