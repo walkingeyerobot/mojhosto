@@ -4,8 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -66,15 +73,46 @@ public class MainActivity extends Activity {
   }
   
   private class JsObject {
+    @SuppressWarnings({ "unused", "unchecked" })
+    @JavascriptInterface
+    public String printCard(String cardjson) throws IOException {
+      System.out.println(cardjson);
+      JSONObject card;
+      try {
+        card = new JSONObject(cardjson);
+      } catch (JSONException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+        return "json exception";
+      }
+      if (card == null) {
+        return "card is null";
+      }
+      JSONArray arr = card.optJSONArray("arr");
+      if (arr == null) {
+        return "arr is null";
+      }
+      int len = arr.length();
+      List<byte[]> list = new ArrayList<byte[]>();
+      for (int i = 0; i < len; i++) {
+        String buf = arr.optString(i);
+        System.out.println(buf);
+        byte[] bytes = buf.getBytes();
+        System.out.println(new String(bytes));
+        list.add(bytes);
+      }
+      new PrintByteList().execute(list);
+      return "success!";
+    }
     @SuppressWarnings("unused")
     @JavascriptInterface
-    public void printCard() throws IOException {
+    public void printPheldy() throws IOException {
       System.out.println("loading file and printing...");
-      loadFileAndPrint();
+      loadFileAndPrint();      
     }
   }
 
-  private class Pheldy extends AsyncTask<ByteArrayOutputStream, Long, Long> {
+  private class PrintByteList extends AsyncTask<List<byte[]>, Long, Long> {
     protected void onPostExecute(Long result) {
 
     }
@@ -83,9 +121,9 @@ public class MainActivity extends Activity {
 
     }
 
-    protected Long doInBackground(ByteArrayOutputStream... baoses) {
+    protected Long doInBackground(List<byte[]>... baoses) {
       try {
-        ByteArrayOutputStream baos = baoses[0];
+        List<byte[]> byteses = baoses[0];
         BluetoothAdapter bluetube = BluetoothAdapter.getDefaultAdapter();
         Set<BluetoothDevice> pairedDevices = bluetube.getBondedDevices();
         for (BluetoothDevice device : pairedDevices) {
@@ -114,28 +152,10 @@ public class MainActivity extends Activity {
             socket.connect();
             if (socket.isConnected()) {
               System.out.println("connected.");
-              byte[] bytes = baos.toByteArray();
-              System.out.println(bytes.length);
-              baos.close();
               OutputStream out = socket.getOutputStream();
-              int start = 0;
-              int len = 1024;
-              int sleep = 0;
-              if (len > bytes.length) {
-                len = bytes.length;
-              }
-              while (true) {
-                out.write(bytes, start, len);
-                if (sleep > 0) {
-                  System.out.println("sleeping...");
-                  Thread.sleep(sleep);
-                }
-                start += len;
-                if (start >= bytes.length) {
-                  break;
-                } else if (start + len > bytes.length) {
-                  len = bytes.length - start;
-                }
+              for (byte[] blah : byteses) {
+                System.out.println(new String(blah));
+                out.write(blah, 0, blah.length);
               }
               out.close();
               socket.close();
@@ -148,13 +168,12 @@ public class MainActivity extends Activity {
         }
       } catch (IOException e) {
         System.out.println("io exception: " + e.getMessage());
-      } catch (InterruptedException e) {
-        System.out.println("interrupt exception: " + e.getMessage());
       }
       return null;
     }
   }
   
+  @SuppressWarnings("unchecked")
   public void loadFileAndPrint() throws IOException {
     final InputStream is = getResources().getAssets().open("pheldy2");
     byte[] byteArray = new byte[1024];
@@ -167,6 +186,9 @@ public class MainActivity extends Activity {
       baos.write(byteArray, 0, i);
     }
     is.close();
-    new Pheldy().execute(baos);
+    List<byte[]> list = new ArrayList<byte[]>();
+    list.add(baos.toByteArray());
+    new PrintByteList().execute(list);
+    baos.close();
   }
 }
