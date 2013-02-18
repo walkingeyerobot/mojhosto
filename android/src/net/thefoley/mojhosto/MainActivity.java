@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +20,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Base64;
 import android.view.Menu;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -96,9 +96,7 @@ public class MainActivity extends Activity {
       List<byte[]> list = new ArrayList<byte[]>();
       for (int i = 0; i < len; i++) {
         String buf = arr.optString(i);
-        System.out.println(buf);
-        byte[] bytes = buf.getBytes();
-        System.out.println(new String(bytes));
+        byte[] bytes = Base64.decode(buf, Base64.DEFAULT);
         list.add(bytes);
       }
       new PrintByteList().execute(list);
@@ -153,9 +151,8 @@ public class MainActivity extends Activity {
             if (socket.isConnected()) {
               System.out.println("connected.");
               OutputStream out = socket.getOutputStream();
-              for (byte[] blah : byteses) {
-                System.out.println(new String(blah));
-                out.write(blah, 0, blah.length);
+              for (byte[] bytes : byteses) {
+                out.write(bytes, 0, bytes.length);
               }
               out.close();
               socket.close();
