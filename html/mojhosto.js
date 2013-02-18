@@ -1,10 +1,10 @@
 $(function() {
-  var enc = window.btoa || $.base64().encode;
+  var btoa = window.btoa || $.base64().encode;
   var card = JSON.stringify({
     arr: [
-      enc('hello world 1\n'),
-      enc('hello world 2\n')
-    ] // make sure they end in \n
+      btoa('hello world 1\n'),
+      btoa('hello world 2\n')
+    ] // make sure the strings end in \n
   });
   function pheldy(e) {
     var injectedObject = window.injectedObject || window.$injectedObject;
