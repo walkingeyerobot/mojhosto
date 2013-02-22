@@ -2,7 +2,6 @@ package net.thefoley.mojhosto;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,7 +10,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 
-class PrintByteList extends AsyncTask<List<byte[]>, Long, Long> {
+class PrintByteList extends AsyncTask<byte[], Long, Long> {
 
   protected void onPostExecute(Long result) {
 
@@ -21,9 +20,8 @@ class PrintByteList extends AsyncTask<List<byte[]>, Long, Long> {
 
   }
 
-  protected Long doInBackground(List<byte[]>... baoses) {
+  protected Long doInBackground(byte[]... byteses) {
     try {
-      List<byte[]> byteses = baoses[0];
       BluetoothAdapter bluetube = BluetoothAdapter.getDefaultAdapter();
       Set<BluetoothDevice> pairedDevices = bluetube.getBondedDevices();
       for (BluetoothDevice device : pairedDevices) {
@@ -54,7 +52,13 @@ class PrintByteList extends AsyncTask<List<byte[]>, Long, Long> {
             System.out.println("connected.");
             OutputStream out = socket.getOutputStream();
             for (byte[] bytes : byteses) {
-              out.write(bytes, 0, bytes.length);
+              int i = 0;
+              while (i < bytes.length){
+                out.write(bytes, i, Math.min(bytes.length - i, 500));
+                out.flush();
+                i += 500;
+                Thread.sleep(100);
+              }
             }
             out.close();
             socket.close();
@@ -67,6 +71,8 @@ class PrintByteList extends AsyncTask<List<byte[]>, Long, Long> {
       }
     } catch (IOException e) {
       System.out.println("io exception: " + e.getMessage());
+    } catch (InterruptedException e) {
+      System.out.println("interrupt exception: " + e.getMessage());
     }
     return null;
   }

@@ -3,10 +3,6 @@ package net.thefoley.mojhosto;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -42,7 +38,7 @@ public class MainActivity extends Activity {
     settings.setDatabaseEnabled(true);
     settings.setDomStorageEnabled(true);
     settings.setDatabasePath("/data/data/net.thefoley.mojhosto/database");
-    settings.setAppCacheMaxSize(1024*1024*8); // 8mb
+    settings.setAppCacheMaxSize(1024*1024*24); // 24mb
     String appCachePath =
         getApplicationContext().getCacheDir().getAbsolutePath();
     settings.setAppCachePath(appCachePath);
@@ -59,23 +55,24 @@ public class MainActivity extends Activity {
     getMenuInflater().inflate(R.menu.activity_main, menu);
     return true;
   }
-  
-  @SuppressWarnings("unchecked")
-  public void loadFileAndPrint() throws IOException {
-    final InputStream is = getResources().getAssets().open("pheldy2");
-    byte[] byteArray = new byte[1024];
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    while (true) {
-      int i = is.read(byteArray);
-      if (i == -1) {
-        break;
+
+  public void loadFileAndPrint() {
+    try {
+      final InputStream is = getResources().getAssets().open("pheldy");
+      byte[] byteArray = new byte[1024];
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      while (true) {
+        int i = is.read(byteArray);
+        if (i == -1) {
+          break;
+        }
+        baos.write(byteArray, 0, i);
       }
-      baos.write(byteArray, 0, i);
+      is.close();
+      new PrintByteList().execute(baos.toByteArray());
+      baos.close();
+    } catch (IOException e) {
+      System.out.println("io exception: " + e.getMessage());
     }
-    is.close();
-    List<byte[]> list = new ArrayList<byte[]>();
-    list.add(baos.toByteArray());
-    new PrintByteList().execute(list);
-    baos.close();
   }
 }
