@@ -6,13 +6,12 @@ $(function() {
       btoa('hello world 2\n')
     ] // make sure the strings end in \n
   });
-  function pheldy(e) {
-    var injectedObject = window.injectedObject || window.$injectedObject;
-    if (injectedObject && injectedObject.printCard) {
-      window.console.log(injectedObject.printCard(card));
-    } else {
-      window.console.log('miss');
-    }
+  var injectedObject = window.injectedObject || window.$injectedObject;
+  function printCard(e) {
+    window.console.log(injectedObject.printCard(card));
+  }
+  function printPheldy(e) {
+    window.console.log(injectedObject.printPheldy());
   }
   function jho(instant) {
     var text = instant ? 'instant' : 'sorcery';
@@ -26,7 +25,8 @@ $(function() {
   function sorcery(e) {
     jho(false);
   }
-  $('#pheldy').click(pheldy);
+  $('#pheldy').click(printPheldy);
+  $('#card').click(printCard);
   $('#instant').click(instant);
   $('#sorcery').click(sorcery);
 });
