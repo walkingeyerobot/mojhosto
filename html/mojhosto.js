@@ -6,7 +6,16 @@ $(function() {
       btoa('hello world 2\n')
     ] // make sure the strings end in \n
   });
-  var injectedObject = window.injectedObject || window.$injectedObject;
+  function notFound() {
+    return 'injectedObject not found.';
+  }
+  var injectedObject =
+    window.injectedObject ||
+    window.$injectedObject ||
+    {
+      printCard: notFound,
+      printPheldy: notFound
+    };
   function printCard(e) {
     window.console.log(injectedObject.printCard(card));
   }
