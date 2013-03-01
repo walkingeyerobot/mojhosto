@@ -24,7 +24,11 @@ $(function() {
   }
   function creature(e) {
     var json = $.getJSON('mojhosto_db.json', function(json) {
-      var item = json[Math.floor(Math.random() * json.length)];
+      var creatures = json.creatures;
+      var randomCmc = creatures[
+        Math.floor(Math.random() * creatures.length)].cards;
+      var item = randomCmc[
+        Math.floor(Math.random() * randomCmc.length)];
       console.log(item);
       console.log(injectedObject.printCard(
         JSON.stringify({arr: [item.data]})));
