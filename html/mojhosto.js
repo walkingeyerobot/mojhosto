@@ -23,7 +23,12 @@ $(function() {
     window.console.log(injectedObject.printPheldy());
   }
   function creature(e) {
-    console.log('creature ' + $('#creature-cmc').val());
+    var json = $.getJSON('mojhosto_db.json', function(json) {
+      var item = json[Math.floor(Math.random() * json.length)];
+      console.log(item);
+      console.log(injectedObject.printCard(
+        JSON.stringify({arr: [item.data]})));
+    });
   }
   function creatureCmc(e) {
     var v = parseInt($(this).val(), 10);
