@@ -6,6 +6,10 @@ $(function() {
       btoa('hello world 2\n')
     ] // make sure the strings end in \n
   });
+  var json;
+  $.getJSON('mojhosto_db.json', function(j) {
+    json = j;
+  });
   function notFound() {
     return 'injectedObject not found.';
   }
@@ -23,16 +27,24 @@ $(function() {
     window.console.log(injectedObject.printPheldy());
   }
   function creature(e) {
-    var json = $.getJSON('mojhosto_db.json', function(json) {
+    if (json) {
       var creatures = json.creatures;
-      var randomCmc = creatures[
-        Math.floor(Math.random() * creatures.length)].cards;
-      var item = randomCmc[
-        Math.floor(Math.random() * randomCmc.length)];
-      console.log(item);
-      console.log(injectedObject.printCard(
+      var val = $('#creature-cmc').val();
+      var idx = 0;
+      if (val === '15') {
+        val = 1;
+        idx = 1;
+      }
+      // TODO(mitch): there may be missing cmcs in the array, so index does not
+      // necessarily correspond to cmc. Either loop through the array, or change
+      // the values on the <option>s.
+      var cmc = creatures[val].cards;
+      var item = cmc[idx];
+        //Math.floor(Math.random() * cmc.length)];
+      window.console.log(item);
+      window.console.log(injectedObject.printCard(
         JSON.stringify({arr: [item.data]})));
-    });
+    }
   }
   function creatureCmc(e) {
     var v = parseInt($(this).val(), 10);
