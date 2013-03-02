@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
     settings.setDatabaseEnabled(true);
     settings.setDomStorageEnabled(true);
     settings.setDatabasePath("/data/data/net.thefoley.mojhosto/database");
-    settings.setAppCacheMaxSize(1024*1024*24); // 24mb
+    settings.setAppCacheMaxSize(1024*1024*128); // 128mb
     String appCachePath =
         getApplicationContext().getCacheDir().getAbsolutePath();
     settings.setAppCachePath(appCachePath);
