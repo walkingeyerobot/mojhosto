@@ -7,9 +7,10 @@ $(function() {
     ] // make sure the strings end in \n
   });
   var linebreaks = btoa('\n\n\n');
-  var json;
+  var json, creatures;
   $.getJSON('mojhosto_db.json', function(j) {
     json = j;
+    creatures = j.creatures;
     console.log('json loaded.');
   });
   function notFound() {
@@ -30,19 +31,19 @@ $(function() {
   }
   function creature(e) {
     if (json) {
-      var creatures = json.creatures;
       var val = $('#creature-cmc').val();
       var idx = 0;
-      if (val === '15') {
-        val = 1;
-        idx = 1;
+      for (var i = 0, leni = creatures.length; i < leni; i++) {
+        if (creatures[i].cmc == val) {
+          var cmc = creatures[i].cards;
+          break;
+        }
       }
-      // TODO(mitch): there may be missing cmcs in the array, so index does not
-      // necessarily correspond to cmc. Either loop through the array, or change
-      // the values on the <option>s.
-      var cmc = creatures[val].cards;
-      var item = cmc[idx];
-        //Math.floor(Math.random() * cmc.length)];
+      if (i === 5) {
+        window.console.log('no entries for that cmc.');
+        return;
+      }
+      var item = cmc[Math.floor(Math.random() * cmc.length)];
       window.console.log(item);
       window.console.log(injectedObject.printCard(
         JSON.stringify({arr: [item.data, linebreaks]})));
