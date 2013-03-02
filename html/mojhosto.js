@@ -6,9 +6,11 @@ $(function() {
       btoa('hello world 2\n')
     ] // make sure the strings end in \n
   });
+  var linebreaks = btoa('\n\n\n');
   var json;
   $.getJSON('mojhosto_db.json', function(j) {
     json = j;
+    console.log('json loaded.');
   });
   function notFound() {
     return 'injectedObject not found.';
@@ -43,7 +45,7 @@ $(function() {
         //Math.floor(Math.random() * cmc.length)];
       window.console.log(item);
       window.console.log(injectedObject.printCard(
-        JSON.stringify({arr: [item.data]})));
+        JSON.stringify({arr: [item.data, linebreaks]})));
     }
   }
   function creatureCmc(e) {
