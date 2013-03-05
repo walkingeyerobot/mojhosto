@@ -1,28 +1,34 @@
 $(function() {
-  var btoa = window.btoa || $.base64().encode;
-  var card = JSON.stringify({
-    arr: [
-      btoa('hello world 1\n'),
-      btoa('hello world 2\n')
-    ] // make sure the strings end in \n
-  });
-  var linebreaks = btoa('\n\n\n');
-  var json, creatures;
-  $.getJSON('mojhosto_db.json', function(j) {
-    json = j;
-    creatures = j.creatures;
-    console.log('json loaded.');
-  });
-  function notFound() {
-    return 'injectedObject not found.';
-  }
   var injectedObject =
     window.injectedObject ||
     window.$injectedObject ||
     {
       printCard: notFound,
-      printPheldy: notFound
+      printPheldy: notFound,
+      fake: true
     };
+  var btoa = window.btoa || $.base64().encode;
+  var card = JSON.stringify({
+    arr: [
+      btoa('hello world 1\n'),
+      'G0AbIQCSloWggqGDlKMKGyEBkpaFoIKhg5SjChshApKWhaCCoYOUowobQAoKCgoK',
+      btoa('hello world 2\n')
+    ] // make sure the strings end in \n
+  });
+  var linebreaks = btoa('\n\n\n');
+  var json, creatures;
+  var jsonFile = 'mojhosto_db.json';
+  if (!injectedObject.fake) {
+    jsonFile = 'file:///android_asset/' + jsonFile;
+  }
+  $.getJSON(jsonFile, function(j) {
+    json = j;
+    creatures = j.creatures;
+    window.console.log('json loaded from ' + jsonFile);
+  });
+  function notFound() {
+    return 'injectedObject not found.';
+  }
   function printCard(e) {
     window.console.log(injectedObject.printCard(card));
   }
@@ -81,6 +87,10 @@ $(function() {
   function sorcery(e) {
     jho(false);
   }
+  function log(str) {
+    $('#log').text(str.toString());
+    return true;
+  }
   $('#pheldy').click(printPheldy);
   $('#card').click(printCard);
   $('#creature').click(creature);
@@ -89,6 +99,7 @@ $(function() {
   $('#equipment-cmc').change(equipmentCmc);
   $('#instant').click(instant);
   $('#sorcery').click(sorcery);
+  window.logFromJava = log;
 });
 function onUpdateReady() {
   window.console.log('update ready');
