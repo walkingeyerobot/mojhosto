@@ -1,5 +1,9 @@
 package net.thefoley.mojhosto;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +22,12 @@ class JsObject {
   @SuppressWarnings({ "unused" })
   @JavascriptInterface
   public String printCard(String cardjson) {
-    System.out.println(cardjson);
+    print(cardjson);
     JSONObject card;
     try {
       card = new JSONObject(cardjson);
     } catch (JSONException e) {
-      System.out.println("JSON exception: " + e.getMessage());
+      print("JSON exception: " + e.getMessage());
       return "json exception";
     }
     if (card == null) {
@@ -40,13 +44,39 @@ class JsObject {
       byte[] bytes = Base64.decode(buf, Base64.DEFAULT);
       byteses[i] = bytes;
     }
-    new PrintByteList().execute(byteses);
+    new PrintByteList(this).execute(byteses);
     return "success!";
   }
+  
+  public void print(String msg) {
+    System.out.println(msg);
+    //TODO: Cram message into some html thing.
+  }
+  
   @JavascriptInterface
   public String printPheldy() {
-    System.out.println("loading file and printing...");
-    activity.loadFileAndPrint();
+    print("loading file and printing...");
+    loadFileAndPrint();
     return "that probably worked.";
+  }
+  
+  public void loadFileAndPrint() {
+    try {
+      final InputStream is = activity.getResources().getAssets().open("pheldy");
+      byte[] byteArray = new byte[1024];
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      while (true) {
+        int i = is.read(byteArray);
+        if (i == -1) {
+          break;
+        }
+        baos.write(byteArray, 0, i);
+      }
+      is.close();
+      new PrintByteList(this).execute(baos.toByteArray());
+      baos.close();
+    } catch (IOException e) {
+      print("io exception: " + e.getMessage());
+    }
   }
 }
