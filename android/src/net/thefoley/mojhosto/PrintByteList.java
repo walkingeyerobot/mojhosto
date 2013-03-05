@@ -11,7 +11,11 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 
 class PrintByteList extends AsyncTask<byte[], Long, Long> {
-
+  private final JsObject display;
+  
+  public PrintByteList(JsObject display) {
+    this.display = display;  
+  }
   protected void onPostExecute(Long result) {
 
   }
@@ -27,7 +31,7 @@ class PrintByteList extends AsyncTask<byte[], Long, Long> {
       for (BluetoothDevice device : pairedDevices) {
         // TODO(mitch): Make this a better comparison
         if (device.getName().equals("Star Micronics")) {
-          System.out.println("found it.");
+          display.print("found it.");
           /*
            * this code caches the UUIDs, but doesn't return them. This code
            * doesn't block.
@@ -49,7 +53,7 @@ class PrintByteList extends AsyncTask<byte[], Long, Long> {
               .createInsecureRfcommSocketToServiceRecord(uuid);
           socket.connect();
           if (socket.isConnected()) {
-            System.out.println("connected.");
+            display.print("connected.");
             OutputStream out = socket.getOutputStream();
             for (byte[] bytes : byteses) {
               int i = 0;
@@ -62,17 +66,17 @@ class PrintByteList extends AsyncTask<byte[], Long, Long> {
             }
             out.close();
             socket.close();
-            System.out.println("closed");
+            display.print("closed");
           } else {
-            System.out.println("can't connect.");
+            display.print("can't connect.");
           }
           break;
         }
       }
     } catch (IOException e) {
-      System.out.println("io exception: " + e.getMessage());
+      display.print("io exception: " + e.getMessage());
     } catch (InterruptedException e) {
-      System.out.println("interrupt exception: " + e.getMessage());
+      display.print("interrupt exception: " + e.getMessage());
     }
     return null;
   }
