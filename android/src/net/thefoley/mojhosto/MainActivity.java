@@ -1,8 +1,5 @@
 package net.thefoley.mojhosto;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -54,25 +51,5 @@ public class MainActivity extends Activity {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.activity_main, menu);
     return true;
-  }
-
-  public void loadFileAndPrint() {
-    try {
-      final InputStream is = getResources().getAssets().open("pheldy");
-      byte[] byteArray = new byte[1024];
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      while (true) {
-        int i = is.read(byteArray);
-        if (i == -1) {
-          break;
-        }
-        baos.write(byteArray, 0, i);
-      }
-      is.close();
-      new PrintByteList().execute(baos.toByteArray());
-      baos.close();
-    } catch (IOException e) {
-      System.out.println("io exception: " + e.getMessage());
-    }
   }
 }
