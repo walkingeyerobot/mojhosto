@@ -8,7 +8,7 @@ $(function() {
       fake: true
     };
   var btoa = window.btoa || $.base64().encode;
-  var card = JSON.stringify({
+  var testData = JSON.stringify({
     arr: [
       btoa('hello world 1\n'),
       'G0AbIQCSloWggqGDlKMKGyEBkpaFoIKhg5SjChshApKWhaCCoYOUowobQAoKCgoK',
@@ -21,7 +21,7 @@ $(function() {
     return 'injectedObject not found.';
   }
   function printCard(e) {
-    window.console.log(injectedObject.printCard(card));
+    window.console.log(injectedObject.printCard(testData));
   }
   function printPheldy(e) {
     window.console.log(injectedObject.printPheldy());
