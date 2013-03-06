@@ -30,7 +30,9 @@ $(function() {
     var val = $('#creature-cmc').val();
     var sql = 'SELECT data, name FROM Creatures WHERE cmc=' + val + ' ORDER BY RANDOM() LIMIT 1';
     window.console.log(sql);
-    window.console.log(injectedObject.printCard(sql, linebreaks));
+    var ret = injectedObject.printCard(sql, linebreaks);
+    last = { card: ret, table: 'Creatures' };
+    window.console.log(ret);
   }
   function creatureCmc(e) {
     var v = parseInt($(this).val(), 10);
@@ -46,13 +48,27 @@ $(function() {
     var val = $('#equipment-cmc').val();
     var sql = 'SELECT data, name FROM Equipment WHERE cmc<' + val + ' ORDER BY RANDOM() LIMIT 1';
     window.console.log(sql);
-    window.console.log(injectedObject.printCard(sql, linebreaks));
+    var ret = injectedObject.printCard(sql, linebreaks);
+    last = { card: ret, table: 'Equipment' };
+    window.console.log(ret);
   }
   function equipmentCmc(e) {
     if ($(this).val() === '-') {
       $('#equipment').attr('disabled', 'disabled');
     } else {
       $('#equipment').removeAttr('disabled');
+    }
+  }
+  function lastCard() {
+    if (last && last.card && last.table) {
+      window.console.log(injectedObject.printCard(
+        'SELECT data, name FROM ' +
+        last.table +
+        ' WHERE name=\'' +
+        last.card +
+        '\'', linebreaks));
+    } else {
+      window.console.log('no last card data.');
     }
   }
   function jho(instant) {
@@ -71,7 +87,7 @@ $(function() {
     $('#log').text(str.toString());
     return true;
   }
-  $('#pheldy').click(printPheldy);
+  $('#last').click(lastCard);
   $('#card').click(printCard);
   $('#creature').click(creature);
   $('#creature-cmc').change(creatureCmc);
