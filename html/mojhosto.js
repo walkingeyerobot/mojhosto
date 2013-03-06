@@ -28,7 +28,10 @@ $(function() {
   }
   function creature(e) {
     var val = $('#creature-cmc').val();
-    var sql = 'SELECT data, name FROM Creatures WHERE cmc=' + val + ' ORDER BY RANDOM() LIMIT 1';
+    var sql =
+      'SELECT data, name FROM Creatures WHERE cmc=' +
+      val +
+      ' ORDER BY RANDOM() LIMIT 1';
     window.console.log(sql);
     var ret = injectedObject.printCard(sql, linebreaks);
     last = { card: ret, table: 'Creatures' };
@@ -46,7 +49,10 @@ $(function() {
   }
   function equipment(e) {
     var val = $('#equipment-cmc').val();
-    var sql = 'SELECT data, name FROM Equipment WHERE cmc<' + val + ' ORDER BY RANDOM() LIMIT 1';
+    var sql =
+      'SELECT data, name FROM Equipment WHERE cmc<' +
+      val +
+      ' ORDER BY RANDOM() LIMIT 1';
     window.console.log(sql);
     var ret = injectedObject.printCard(sql, linebreaks);
     last = { card: ret, table: 'Equipment' };
