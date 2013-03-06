@@ -16,16 +16,7 @@ $(function() {
     ] // make sure the strings end in \n
   });
   var linebreaks = btoa('\n\n\n');
-  var json, creatures;
-  var jsonFile = 'mojhosto_db.json';
-  if (!injectedObject.fake) {
-    jsonFile = 'file:///android_asset/' + jsonFile;
-  }
-  $.getJSON(jsonFile, function(j) {
-    json = j;
-    creatures = j.creatures;
-    window.console.log('json loaded from ' + jsonFile);
-  });
+
   function notFound() {
     return 'injectedObject not found.';
   }
@@ -36,24 +27,10 @@ $(function() {
     window.console.log(injectedObject.printPheldy());
   }
   function creature(e) {
-    if (json) {
-      var val = $('#creature-cmc').val();
-      var idx = 0;
-      for (var i = 0, leni = creatures.length; i < leni; i++) {
-        if (creatures[i].cmc == val) {
-          var cmc = creatures[i].cards;
-          break;
-        }
-      }
-      if (i === 5) {
-        window.console.log('no entries for that cmc.');
-        return;
-      }
-      var item = cmc[Math.floor(Math.random() * cmc.length)];
-      window.console.log(item);
-      window.console.log(injectedObject.printCard(
-        JSON.stringify({arr: [item.data, linebreaks]})));
-    }
+    var val = $('#creature-cmc').val();
+    var sql = 'SELECT data, name FROM Creatures WHERE cmc=' + val + ' ORDER BY RANDOM() LIMIT 1';
+    window.console.log(sql);
+    window.console.log(injectedObject.printCard(sql, linebreaks));
   }
   function creatureCmc(e) {
     var v = parseInt($(this).val(), 10);
@@ -66,7 +43,10 @@ $(function() {
     equipmentCmc.call($('#equipment-cmc'), e);
   }
   function equipment(e) {
-    console.log('equipment <' + $('#equipment-cmc').val());
+    var val = $('#equipment-cmc').val();
+    var sql = 'SELECT data, name FROM Equipment WHERE cmc<' + val + ' ORDER BY RANDOM() LIMIT 1';
+    window.console.log(sql);
+    window.console.log(injectedObject.printCard(sql, linebreaks));
   }
   function equipmentCmc(e) {
     if ($(this).val() === '-') {
