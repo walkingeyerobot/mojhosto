@@ -8,20 +8,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 
 class JsObject {
   private final MainActivity activity;
+  private final SQLiteDatabase database;
   /**
    * @param mainActivity
+   * @param sdb 
    */
-  JsObject(MainActivity mainActivity) {
+  JsObject(MainActivity mainActivity, SQLiteDatabase sdb) {
     activity = mainActivity;
+    database = sdb;
   }
   @SuppressWarnings({ "unused" })
   @JavascriptInterface
-  public String printCard(String cardjson) {
+  public String printBase64String(String cardjson) {
     print(cardjson);
     JSONObject card;
     try {
@@ -58,6 +63,26 @@ class JsObject {
     print("loading file and printing...");
     loadFileAndPrint();
     return "that probably worked.";
+  }
+  
+  @JavascriptInterface
+  public String printCard(String query, String padding) {
+    print("exec sql: " + query);
+    Cursor cur = database.rawQuery(query, null);
+    if (cur.getCount() != 1) {
+      return "incorrect number of rows returned.";
+    }
+    if (!cur.moveToFirst()) {
+      return "unable to move to first.";
+    }
+    byte[] blob = cur.getBlob(0);
+    byte[][] byteses = new byte[2][];
+    byteses[0] = blob;
+    byte[] bytes = Base64.decode(padding, Base64.DEFAULT);
+    byteses[1] = bytes;
+    new PrintByteList(this).execute(byteses);
+    String s = cur.getString(1);
+    return s;
   }
   
   public void loadFileAndPrint() {

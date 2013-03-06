@@ -13,11 +13,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 	private static String DB_PATH = "/data/data/net.thefoley.mojhosto/databases/";
-	private static String DB_NAME = "myDBName";
+	private static String DB_NAME = "mojhosto_db.sqlite";
 	private SQLiteDatabase myDataBase;
 	private final Context myContext;
 	public DataBaseHelper(Context context) {
-		super(context, DB_NAME, null, 1);
+		super(context, DB_NAME, null, 3);
 		this.myContext = context;
 	}
 	public void createDataBase() throws IOException {
