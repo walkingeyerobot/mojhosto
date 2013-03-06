@@ -14,15 +14,15 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
-
+  private WebView webView;
   @SuppressLint("SetJavaScriptEnabled")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    WebView webview = (WebView) findViewById(R.id.webView1);
-    webview.setWebViewClient(new WebViewClient());
-    webview.setWebChromeClient(new WebChromeClient() {
+    webView = (WebView) findViewById(R.id.webView1);
+    webView.setWebViewClient(new WebViewClient());
+    webView.setWebChromeClient(new WebChromeClient() {
       @Override
       public void onExceededDatabaseQuota(
           String url,
@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         quotaUpdater.updateQuota(estimatedSize * 2);
       }
     });
-    WebSettings settings = webview.getSettings();
+    WebSettings settings = webView.getSettings();
     settings.setJavaScriptEnabled(true);
     settings.setDatabaseEnabled(true);
     settings.setDomStorageEnabled(true);
@@ -48,7 +48,6 @@ public class MainActivity extends Activity {
     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
     
     DataBaseHelper myDbHelper = new DataBaseHelper(this);
-    myDbHelper = new DataBaseHelper(this);
 
     try {
       myDbHelper.createDataBase();
@@ -64,10 +63,14 @@ public class MainActivity extends Activity {
     
     SQLiteDatabase sdb = myDbHelper.getReadableDatabase();
     
-    webview.addJavascriptInterface(new JsObject(this, sdb), "injectedObject");
-    webview.loadUrl("http://thefoley.net/mojhosto/index.html");
+    webView.addJavascriptInterface(new JsObject(this, sdb), "injectedObject");
+    webView.loadUrl("http://thefoley.net/mojhosto/index.html");
   }
 
+  public WebView getWebView() {
+    return webView;
+  }
+  
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
