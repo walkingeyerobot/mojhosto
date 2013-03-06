@@ -1,8 +1,12 @@
 package net.thefoley.mojhosto;
 
+import java.io.IOException;
+
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.view.Menu;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -42,7 +46,25 @@ public class MainActivity extends Activity {
     settings.setAllowFileAccess(true);
     settings.setAppCacheEnabled(true);
     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-    webview.addJavascriptInterface(new JsObject(this), "injectedObject");
+    
+    DataBaseHelper myDbHelper = new DataBaseHelper(this);
+    myDbHelper = new DataBaseHelper(this);
+
+    try {
+      myDbHelper.createDataBase();
+    } catch (IOException ioe) {
+      throw new Error("Unable to create database");
+    }
+
+    try {
+      myDbHelper.openDataBase();
+    } catch (SQLException sqle) {
+      throw sqle;
+    }
+    
+    SQLiteDatabase sdb = myDbHelper.getReadableDatabase();
+    
+    webview.addJavascriptInterface(new JsObject(this, sdb), "injectedObject");
     webview.loadUrl("http://thefoley.net/mojhosto/index.html");
   }
 
