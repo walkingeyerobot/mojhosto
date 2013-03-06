@@ -55,6 +55,7 @@ class JsObject {
   
   public void print(String msg) {
     System.out.println(msg);
+    activity.getWebView().loadUrl("javascript:logFromJava('" + msg + "')");
     //TODO: Cram message into some html thing.
   }
   
