@@ -27,6 +27,10 @@ class PrintByteList extends AsyncTask<byte[], Long, Long> {
   protected Long doInBackground(byte[]... byteses) {
     try {
       BluetoothAdapter bluetube = BluetoothAdapter.getDefaultAdapter();
+      if (bluetube == null) {
+        display.print("No Bluetooth adapter found.");
+        return 0L;
+      }
       Set<BluetoothDevice> pairedDevices = bluetube.getBondedDevices();
       for (BluetoothDevice device : pairedDevices) {
         // TODO(mitch): Make this a better comparison
