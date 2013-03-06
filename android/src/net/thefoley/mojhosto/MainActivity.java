@@ -5,7 +5,6 @@ import java.io.IOException;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.Menu;
 import android.webkit.WebChromeClient;
@@ -38,7 +37,7 @@ public class MainActivity extends Activity {
     settings.setJavaScriptEnabled(true);
     settings.setDatabaseEnabled(true);
     settings.setDomStorageEnabled(true);
-    settings.setDatabasePath("/data/data/net.thefoley.mojhosto/database");
+    settings.setDatabasePath(getFilesDir().getPath());
     settings.setAppCacheMaxSize(1024*1024*128); // 128mb
     String appCachePath =
         getApplicationContext().getCacheDir().getAbsolutePath();
@@ -46,22 +45,14 @@ public class MainActivity extends Activity {
     settings.setAllowFileAccess(true);
     settings.setAppCacheEnabled(true);
     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-    
-    DataBaseHelper myDbHelper = new DataBaseHelper(this);
 
+    SQLiteDatabase sdb = null;
     try {
-      myDbHelper.createDataBase();
-    } catch (IOException ioe) {
-      throw new Error("Unable to create database");
+      DataBaseHelper myDbHelper = new DataBaseHelper(this);
+      sdb = myDbHelper.getReadableDatabase();
+    } catch (Exception e) {
+      System.out.println("Couldn't init database");
     }
-
-    try {
-      myDbHelper.openDataBase();
-    } catch (SQLException sqle) {
-      throw sqle;
-    }
-    
-    SQLiteDatabase sdb = myDbHelper.getReadableDatabase();
     
     webView.addJavascriptInterface(new JsObject(this, sdb), "injectedObject");
     webView.loadUrl("http://thefoley.net/mojhosto/index.html");
