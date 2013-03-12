@@ -1,7 +1,5 @@
 package net.thefoley.mojhosto;
 
-import java.io.IOException;
-
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
