@@ -46,8 +46,10 @@ public class MainActivity extends Activity {
 
     SQLiteDatabase sdb = null;
     try {
-      DataBaseHelper myDbHelper = new DataBaseHelper(this);
-      sdb = myDbHelper.getReadableDatabase();
+      sdb = SQLiteDatabase.openDatabase(
+          getFilesDir().getPath() + "/mojhosto_db.sqlite",
+          null,
+          SQLiteDatabase.OPEN_READONLY);
     } catch (Exception e) {
       System.out.println("Couldn't init database");
     }
