@@ -54,6 +54,7 @@ class JsObject {
   }
 
   public void print(String msg) {
+    System.out.println(msg);
     activity.getWebView().loadUrl(
         "javascript:logFromJava('" + msg.replaceAll("'", "") + "')");
   }

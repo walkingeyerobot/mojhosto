@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
           null,
           SQLiteDatabase.OPEN_READONLY);
     } catch (Exception e) {
-      System.out.println("Couldn't init database");
+      System.out.println("Couldn't init database: " + e.getMessage());
     }
     
     webView.addJavascriptInterface(new JsObject(this, sdb), "injectedObject");
