@@ -61,7 +61,7 @@ class JsObject {
 
   @JavascriptInterface
   public String printCard(String query, String padding) {
-    print("exec sql: " + query);
+    //print("exec sql: " + query);
     if (database == null) {
       return "database unavailable.";
     }
@@ -80,6 +80,59 @@ class JsObject {
     new PrintByteList(this).execute(byteses);
     String s = cur.getString(1);
     return s;
+  }
+  
+  @JavascriptInterface
+  public String getJhos(String query, String print, String padding) {
+    if (database == null) {
+      return "database unavailable.";
+    }
+    if (print.equalsIgnoreCase("instants") || print.equalsIgnoreCase("sorceries")) {
+      Cursor cur = database.rawQuery("SELECT data FROM " + print + " ORDER BY RANDOM() LIMIT 3", null);
+      byte[][] byteses = new byte[4][];
+      int i = 0;
+      while (cur.moveToNext()) {
+        byte[] blob = cur.getBlob(0);
+        byteses[i] = blob;
+        i++;
+      }
+      byteses[3] = Base64.decode(padding, Base64.DEFAULT);
+      new PrintByteList(this).execute(byteses);
+      return "done.";
+    }
+    Cursor cur = database.rawQuery(query, null);
+    if (cur.getCount() != 3) {
+      return "incorrect number of rows returned.";
+    }
+    
+    JSONArray ret = new JSONArray();
+    while (cur.moveToNext()) {
+      JSONObject obj = new JSONObject();
+      int id = cur.getInt(0);
+      String name = cur.getString(1);
+      int face = cur.getInt(2);
+      String cost = cur.getString(3);
+      String color_ind = cur.getString(4);
+      String typeline = cur.getString(5);
+      String rules = cur.getString(6);
+      String color = cur.getString(7);
+      try {
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("face", face);
+        obj.put("cost", cost);
+        obj.put("color_ind", color_ind);
+        obj.put("typeline", typeline);
+        obj.put("rules", rules);
+        obj.put("color", color);
+        ret.put(obj);
+      } catch (JSONException e) {
+        String err = "JSONException: " + e.getMessage();
+        System.out.println(err);
+        return err;
+      }
+    }
+    return ret.toString();
   }
 
 }
