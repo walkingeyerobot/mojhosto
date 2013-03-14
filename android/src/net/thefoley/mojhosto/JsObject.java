@@ -62,12 +62,15 @@ class JsObject {
   @JavascriptInterface
   public String printCard(String query, String padding) {
     print("exec sql: " + query);
+    if (database == null) {
+      return "database unavailable.";
+    }
     Cursor cur = database.rawQuery(query, null);
     if (cur.getCount() != 1) {
-      print("incorrect number of rows returned.");
+      return "incorrect number of rows returned.";
     }
     if (!cur.moveToFirst()) {
-      print("unable to move to first.");
+      return "unable to move cursor to first.";
     }
     byte[] blob = cur.getBlob(0);
     byte[][] byteses = new byte[2][];

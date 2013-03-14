@@ -1,5 +1,7 @@
 package net.thefoley.mojhosto;
 
+import java.io.File;
+
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -44,6 +46,24 @@ public class MainActivity extends Activity {
     settings.setAppCacheEnabled(true);
     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
+    try {
+      File f = getDatabasePath("mojhosto_db.sqlite");
+      System.out.println("path: " + f.getAbsolutePath());
+      if (f.exists()) {
+        System.out.println("exists");
+      } else {
+        System.out.println("does not exist.");
+      }
+      boolean result = SQLiteDatabase.deleteDatabase(f);
+      if (result) {
+        System.out.println("true");
+      } else {
+        System.out.println("false");
+      }
+    } catch (Exception e) {
+      System.out.println("ERRORZ: " + e.getMessage());
+    }
+    
     SQLiteDatabase sdb = null;
     try {
       sdb = SQLiteDatabase.openDatabase(
