@@ -1,6 +1,10 @@
 package net.thefoley.mojhosto;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.os.Bundle;
 import android.annotation.SuppressLint;
@@ -46,34 +50,26 @@ public class MainActivity extends Activity {
     settings.setAppCacheEnabled(true);
     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-    try {
-      File f = getDatabasePath("mojhosto_db.sqlite");
-      System.out.println("path: " + f.getAbsolutePath());
-      if (f.exists()) {
-        System.out.println("exists");
-      } else {
-        System.out.println("does not exist.");
-      }
-      boolean result = SQLiteDatabase.deleteDatabase(f);
-      if (result) {
-        System.out.println("true");
-      } else {
-        System.out.println("false");
-      }
-    } catch (Exception e) {
-      System.out.println("ERRORZ: " + e.getMessage());
-    }
-    
     SQLiteDatabase sdb = null;
-    try {
-      sdb = SQLiteDatabase.openDatabase(
-          getFilesDir().getPath() + "/mojhosto_db.sqlite",
-          null,
-          SQLiteDatabase.OPEN_READONLY);
-    } catch (Exception e) {
-      System.out.println("Couldn't init database: " + e.getMessage());
+    File dbFile = getDatabasePath("mojhosto_db.sqlite");
+    if (!dbFile.exists()) {
+      try {
+        InputStream is = getAssets().open("mojhosto_db.sqlite");
+        OutputStream os = new FileOutputStream(dbFile);
+        byte[] buffer = new byte[1024];
+        while (is.read(buffer) > 0) {
+          os.write(buffer);
+        }
+        os.flush();
+        os.close();
+        is.close();
+      } catch (IOException e) {
+        System.out.println("unable to copy db: " + e.getMessage());
+      }
     }
     
+    sdb = SQLiteDatabase.openDatabase(dbFile.getPath(), null, SQLiteDatabase.OPEN_READONLY);
+
     webView.addJavascriptInterface(new JsObject(this, sdb), "injectedObject");
     webView.loadUrl("http://thefoley.net/mojhosto/index.html");
   }
