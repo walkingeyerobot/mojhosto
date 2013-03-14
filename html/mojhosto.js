@@ -5,6 +5,7 @@ $(function() {
     {
       printCard: notFound,
       printPheldy: notFound,
+      getJhos: fakeJhos,
       fake: true
     };
   var btoa = window.btoa || $.base64().encode;
@@ -19,6 +20,39 @@ $(function() {
 
   function notFound() {
     return 'injectedObject not found.';
+  }
+  function fakeJhos() {
+    var ret = [
+      {
+        "id": 2032,
+        "face": 1,
+        "typeline": "Sorcery",
+        "color": "G",
+        "cost": "2G",
+        "rules": "Search your library for up to two basic land cards, reveal those cards, and put one onto the battlefield tapped and the other into your hand. Then shuffle your library.\n",
+        "name": "Cultivate"
+      }, {
+        "id": 1692,
+        "face": 1,
+        "typeline": "Sorcery",
+        "color": "B",
+        "cost": "4BB",
+        "rules": "Search target player's library for X cards, where X is the number of cards in your hand, and exile them. Then that player shuffles his or her library.\nEpic (For the rest of the game, you can't cast spells. At the beginning of each of your upkeeps, copy this spell except for its epic ability. You may choose a new target for the copy.)\n",
+        "name": "Neverending Torment"
+      }, {
+        "id": 2337,
+        "face": 1,
+        "typeline": "Sorcery",
+        "color": "R",
+        "cost": "R",
+        "rules": "Replicate {R} (When you cast this spell, copy it for each time you paid its replicate cost. You may choose new targets for the copies.)\nDestroy target artifact.\n",
+        "name": "Shattering Spree"
+      }
+    ];
+    doSomethingWithInstantsAndSorceries(ret);
+  }
+  function doSomethingWithInstantsAndSorceries(arr) {
+    // TODO(ned): this will get called with instant or sorcery data.
   }
   function printCard(e) {
     window.console.log(injectedObject.printCard(testData));
@@ -44,7 +78,7 @@ $(function() {
     } else if (v > 8) {
       v = 8;
     }
-    $('#equipment-cmc').val(v+'');
+    $('#equipment-cmc').val(v + '');
     equipmentCmc.call($('#equipment-cmc'), e);
   }
   function equipment(e) {
@@ -78,10 +112,15 @@ $(function() {
     }
   }
   function jho(instant) {
-    var text = instant ? 'instant' : 'sorcery';
-    $('#jho>div').each(function(i, elem) {
-      $(elem).text(text + ' ' + Math.random());
-    });
+    var text = instant ? 'INSTANTS' : 'SORCERIES';
+    var jhos = injectedObject.getJhos(
+      'SELECT s.id, c.name, c.face, c.cost, c.color_ind, c.typeline, ' +
+      'c.rules, c.color FROM ' +
+      text +
+      ' s LEFT OUTER JOIN CARDDATA c ON s.id=c.id ORDER BY RANDOM() ' +
+      'LIMIT 3;', text, linebreaks);
+    window.console.log(jhos);
+    doSomethingWithInstantsAndSorceries(JSON.parse(jhos));
   }
   function instant(e) {
     jho(true);
