@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
     settings.setDatabaseEnabled(true);
     settings.setDomStorageEnabled(true);
     settings.setDatabasePath(getFilesDir().getPath());
-    settings.setAppCacheMaxSize(1024*1024*128); // 128mb
+    settings.setAppCacheMaxSize(1024*1024*4); // 4mb
     String appCachePath =
         getApplicationContext().getCacheDir().getAbsolutePath();
     settings.setAppCachePath(appCachePath);
@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
     
     sdb = SQLiteDatabase.openDatabase(dbFile.getPath(), null, SQLiteDatabase.OPEN_READONLY);
 
-    webView.addJavascriptInterface(new JsObject(this, sdb), "injectedObject");
+    webView.addJavascriptInterface(new JsObject(sdb), "injectedObject");
     webView.loadUrl("http://thefoley.net/mojhosto/index.html");
   }
 
