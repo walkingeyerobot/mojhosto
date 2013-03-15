@@ -10,37 +10,31 @@ import android.util.Base64;
 import android.webkit.JavascriptInterface;
 
 class JsObject {
-  private final MainActivity activity;
   private final SQLiteDatabase database;
 
   /**
    * @param mainActivity
    * @param sdb
    */
-  JsObject(MainActivity mainActivity, SQLiteDatabase sdb) {
-    activity = mainActivity;
+  JsObject(SQLiteDatabase sdb) {
     database = sdb;
   }
   
   @SuppressWarnings({ "unused" })
   @JavascriptInterface
   public String printBase64String(String cardjson) {
-    print(cardjson);
     JSONObject card;
     try {
       card = new JSONObject(cardjson);
     } catch (JSONException e) {
-      print("JSON exception: " + e.getMessage());
-      return null;
+      return "JSON exception: " + e.getMessage();
     }
     if (card == null) {
-      print("card is null");
-      return null;
+      return "card is null";
     }
     JSONArray arr = card.optJSONArray("arr");
     if (arr == null) {
-      print("No data for card. Check database.");
-      return null;
+      return "No data for card. Check database.";
     }
     int len = arr.length();
     byte[][] byteses = new byte[len][];
@@ -49,19 +43,12 @@ class JsObject {
       byte[] bytes = Base64.decode(buf, Base64.DEFAULT);
       byteses[i] = bytes;
     }
-    new PrintByteList(this).execute(byteses);
+    new PrintByteList().execute(byteses);
     return "success!";
-  }
-
-  public void print(String msg) {
-    System.out.println(msg);
-    activity.getWebView().loadUrl(
-        "javascript:logFromJava('" + msg.replaceAll("'", "") + "')");
   }
 
   @JavascriptInterface
   public String printCard(String query, String padding) {
-    //print("exec sql: " + query);
     if (database == null) {
       return "database unavailable.";
     }
@@ -77,9 +64,12 @@ class JsObject {
     byteses[0] = blob;
     byte[] bytes = Base64.decode(padding, Base64.DEFAULT);
     byteses[1] = bytes;
-    new PrintByteList(this).execute(byteses);
-    String s = cur.getString(1);
-    return s;
+    new PrintByteList().execute(byteses);
+    if (cur.getColumnCount() == 2) {
+      String s = cur.getString(1);
+      return s;
+    }
+    return "";
   }
   
   @JavascriptInterface
@@ -87,19 +77,23 @@ class JsObject {
     if (database == null) {
       return "database unavailable.";
     }
+    
     if (print.equalsIgnoreCase("instants") || print.equalsIgnoreCase("sorceries")) {
-      Cursor cur = database.rawQuery("SELECT data FROM " + print + " ORDER BY RANDOM() LIMIT 3", null);
+      Cursor cur = database.rawQuery("SELECT data, id FROM " + print + " ORDER BY RANDOM() LIMIT 3", null);
       byte[][] byteses = new byte[4][];
       int i = 0;
+      JSONArray arr = new JSONArray();
       while (cur.moveToNext()) {
         byte[] blob = cur.getBlob(0);
         byteses[i] = blob;
+        arr.put(cur.getInt(1));
         i++;
       }
       byteses[3] = Base64.decode(padding, Base64.DEFAULT);
-      new PrintByteList(this).execute(byteses);
-      return "done.";
+      new PrintByteList().execute(byteses);
+      return arr.toString();
     }
+    
     Cursor cur = database.rawQuery(query, null);
     if (cur.getCount() != 3) {
       return "incorrect number of rows returned.";
@@ -107,29 +101,39 @@ class JsObject {
     
     JSONArray ret = new JSONArray();
     while (cur.moveToNext()) {
-      JSONObject obj = new JSONObject();
-      int id = cur.getInt(0);
-      String name = cur.getString(1);
-      int face = cur.getInt(2);
-      String cost = cur.getString(3);
-      String color_ind = cur.getString(4);
-      String typeline = cur.getString(5);
-      String rules = cur.getString(6);
-      String color = cur.getString(7);
       try {
-        obj.put("id", id);
-        obj.put("name", name);
-        obj.put("face", face);
-        obj.put("cost", cost);
-        obj.put("color_ind", color_ind);
-        obj.put("typeline", typeline);
-        obj.put("rules", rules);
-        obj.put("color", color);
+        JSONObject obj = new JSONObject();
+        for (int i = 0; i < cur.getColumnCount(); i++) {
+          String name = cur.getColumnName(i);
+          switch(cur.getType(i)) {
+          case Cursor.FIELD_TYPE_BLOB:
+            byte[] blob = cur.getBlob(i);
+            byte[] bytes = Base64.encode(blob, Base64.DEFAULT);
+            String blobVal = new String(bytes);
+            obj.put(name, blobVal);
+            break;
+          case Cursor.FIELD_TYPE_FLOAT:
+            float floatVal = cur.getFloat(i);
+            obj.put(name, floatVal);
+            break;
+          case Cursor.FIELD_TYPE_INTEGER:
+            int intVal = cur.getInt(i);
+            obj.put(name, intVal);
+            break;
+          case Cursor.FIELD_TYPE_STRING:
+            String strVal = cur.getString(i);
+            obj.put(name, strVal);
+            break;
+          case Cursor.FIELD_TYPE_NULL:
+            obj.put(name, "");
+            break;
+          default:
+            return "unknown field type.";
+          }
+        }
         ret.put(obj);
       } catch (JSONException e) {
-        String err = "JSONException: " + e.getMessage();
-        System.out.println(err);
-        return err;
+        return "JSONException: " + e.getMessage();
       }
     }
     return ret.toString();

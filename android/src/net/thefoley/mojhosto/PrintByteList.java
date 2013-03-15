@@ -11,11 +11,8 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 
 class PrintByteList extends AsyncTask<byte[], Long, Long> {
-  private final JsObject display;
   
-  public PrintByteList(JsObject display) {
-    this.display = display;  
-  }
+  public PrintByteList() { }
   protected void onPostExecute(Long result) {
 
   }
@@ -28,14 +25,14 @@ class PrintByteList extends AsyncTask<byte[], Long, Long> {
     try {
       BluetoothAdapter bluetube = BluetoothAdapter.getDefaultAdapter();
       if (bluetube == null) {
-        display.print("No Bluetooth adapter found.");
+        System.out.println("No Bluetooth adapter found.");
         return 0L;
       }
       Set<BluetoothDevice> pairedDevices = bluetube.getBondedDevices();
       for (BluetoothDevice device : pairedDevices) {
         // TODO(mitch): Make this a better comparison
         if (device.getName().equals("Star Micronics")) {
-          display.print("found it.");
+          System.out.println("found it.");
           /*
            * this code caches the UUIDs, but doesn't return them. This code
            * doesn't block.
@@ -57,7 +54,7 @@ class PrintByteList extends AsyncTask<byte[], Long, Long> {
               .createInsecureRfcommSocketToServiceRecord(uuid);
           socket.connect();
           if (socket.isConnected()) {
-            display.print("connected.");
+            System.out.println("connected.");
             OutputStream out = socket.getOutputStream();
             for (byte[] bytes : byteses) {
               int i = 0;
@@ -70,17 +67,17 @@ class PrintByteList extends AsyncTask<byte[], Long, Long> {
             }
             out.close();
             socket.close();
-            display.print("closed");
+            System.out.println("closed");
           } else {
-            display.print("can't connect.");
+            System.out.println("can't connect.");
           }
           break;
         }
       }
     } catch (IOException e) {
-      display.print("io exception: " + e.getMessage());
+      System.out.println("io exception: " + e.getMessage());
     } catch (InterruptedException e) {
-      display.print("interrupt exception: " + e.getMessage());
+      System.out.println("interrupt exception: " + e.getMessage());
     }
     return null;
   }
