@@ -4,19 +4,12 @@ $(function() {
     window.$injectedObject ||
     {
       printCard: notFound,
-      printPheldy: notFound,
       getJhos: fakeJhos,
       fake: true
     };
   var btoa = window.btoa || $.base64().encode;
-  var testData = JSON.stringify({
-    arr: [
-      btoa('hello world 1\n'),
-      'G0AbIQCSloWggqGDlKMKGyEBkpaFoIKhg5SjChshApKWhaCCoYOUowobQAoKCgoK',
-      btoa('hello world 2\n')
-    ] // make sure the strings end in \n
-  });
   var linebreaks = btoa('\n\n\n');
+  var last;
 
   function notFound() {
     return 'injectedObject not found.';
@@ -54,22 +47,16 @@ $(function() {
   function doSomethingWithInstantsAndSorceries(arr) {
     // TODO(ned): this will get called with instant or sorcery data.
   }
-  function printCard(e) {
-    window.console.log(injectedObject.printCard(testData));
-  }
-  function printPheldy(e) {
-    window.console.log(injectedObject.printPheldy());
-  }
   function creature(e) {
     var val = $('#creature-cmc').val();
     var sql =
       'SELECT data, name FROM Creatures WHERE cmc=' +
       val +
       ' ORDER BY RANDOM() LIMIT 1';
-    window.console.log(sql);
+    log(sql);
     var ret = injectedObject.printCard(sql, linebreaks);
     last = { card: ret, table: 'Creatures' };
-    window.console.log(ret);
+    log(ret);
   }
   function creatureCmc(e) {
     var v = parseInt($(this).val(), 10);
@@ -87,10 +74,10 @@ $(function() {
       'SELECT data, name FROM Equipment WHERE cmc<' +
       val +
       ' ORDER BY RANDOM() LIMIT 1';
-    window.console.log(sql);
+    log(sql);
     var ret = injectedObject.printCard(sql, linebreaks);
     last = { card: ret, table: 'Equipment' };
-    window.console.log(ret);
+    log(ret);
   }
   function equipmentCmc(e) {
     if ($(this).val() === '-') {
@@ -100,15 +87,31 @@ $(function() {
     }
   }
   function lastCard() {
-    if (last && last.card && last.table) {
-      window.console.log(injectedObject.printCard(
-        'SELECT data, name FROM ' +
-        last.table +
-        ' WHERE name=\'' +
-        last.card +
-        '\'', linebreaks));
+    if (last) {
+	  if (last.card && last.table) {
+        log(injectedObject.printCard(
+          'SELECT data, name FROM ' +
+          last.table +
+          ' WHERE name=\'' +
+          last.card +
+          '\'', linebreaks));
+      } else if (last.jhos && last.table) {
+	    log(injectedObject.printCard(
+		  'SELECT (SELECT a.data FROM ' +
+		  last.table +
+		  ' a WHERE a.id=' +
+		  last.jhos[0] + 
+		  ') || (SELECT b.data FROM ' +
+		  last.table +
+		  ' b WHERE b.id=' +
+		  last.jhos[1] +
+		  ') || (SELECT c.data FROM ' +
+		  last.table +
+		  ' c WHERE c.id=' +
+		  last.jhos[2] + ')', linebreaks));
+	  }
     } else {
-      window.console.log('no last card data.');
+      log('no last card data.');
     }
   }
   function jho(instant) {
@@ -118,8 +121,13 @@ $(function() {
       'c.rules, c.color FROM ' +
       text +
       ' s LEFT OUTER JOIN CARDDATA c ON s.id=c.id ORDER BY RANDOM() ' +
-      'LIMIT 3;', text, linebreaks);
-    window.console.log(jhos);
+      'LIMIT 3;',
+	  text, linebreaks); // pass '', '' instead for real data (but no printing)
+    log(jhos);
+	last = {
+	  table: text,
+	  jhos: JSON.parse(jhos)
+	};
     doSomethingWithInstantsAndSorceries(JSON.parse(jhos));
   }
   function instant(e) {
@@ -129,25 +137,22 @@ $(function() {
     jho(false);
   }
   function log(str) {
-    $('#log').text(str.toString());
-    return true;
+    window.console.log(str);
   }
   $('#last').click(lastCard);
-  $('#card').click(printCard);
   $('#creature').click(creature);
   $('#creature-cmc').change(creatureCmc);
   $('#equipment').click(equipment);
   $('#equipment-cmc').change(equipmentCmc);
   $('#instant').click(instant);
   $('#sorcery').click(sorcery);
-  window.logFromJava = log;
 });
 function onUpdateReady() {
-  window.console.log('update ready');
+  window.console.log('update ready. reloading...');
   window.applicationCache.swapCache();
   window.location.reload();
 }
 window.applicationCache.addEventListener('updateready', onUpdateReady);
-if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
+if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
   onUpdateReady();
 }
