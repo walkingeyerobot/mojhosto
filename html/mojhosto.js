@@ -117,12 +117,12 @@ $(function() {
   function jho(instant) {
     var text = instant ? 'INSTANTS' : 'SORCERIES';
     var jhos = injectedObject.getJhos(
-      'SELECT s.id, c.name, c.face, c.cost, c.color_ind, c.typeline, ' +
-      'c.rules, c.color FROM ' +
-      text +
-      ' s LEFT OUTER JOIN CARDDATA c ON s.id=c.id ORDER BY RANDOM() ' +
-      'LIMIT 3;',
-	  text, linebreaks); // pass '', '' instead for real data (but no printing)
+      'SELECT c.id, c.name, c.face, c.cost, c.color_ind, c.typeline, c.rules, ' +
+      'c.color FROM (SELECT s.id FROM ' +
+      text + 
+      ' s ORDER BY RANDOM() LIMIT 3) AS ss LEFT OUTER JOIN CARDDATA c ' +
+      'ON ss.id=c.id ORDER BY c.id,c.face;',
+      text, linebreaks); // pass '', '' instead for real data (but no printing)
     log(jhos);
 	last = {
 	  table: text,
