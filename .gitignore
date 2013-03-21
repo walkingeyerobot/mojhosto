@@ -16,3 +16,6 @@ gen/
 local.properties
 
 .DS_Store
+
+# Sadly, ignore the database
+mojhosto_db.sqlite
