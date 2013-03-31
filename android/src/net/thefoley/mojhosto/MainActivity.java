@@ -73,7 +73,8 @@ public class MainActivity extends Activity {
     sdb = SQLiteDatabase.openDatabase(dbFile.getPath(), null, SQLiteDatabase.OPEN_READONLY);
 
     webView.addJavascriptInterface(new JsObject(sdb), "injectedObject");
-    webView.loadUrl("http://thefoley.net/mojhosto/index.html");
+    //webView.loadUrl("http://thefoley.net/mojhosto/index.html");
+    webView.loadUrl("http://192.168.1.187:8080");
   }
 
   public WebView getWebView() {
