@@ -1,0 +1,22 @@
+{
+  "curly": true,
+  "eqeqeq": false,
+  "immed": true,
+  "latedef": false,
+  "newcap": true,
+  "noarg": true,
+  "sub": true,
+  "undef": true,
+  "quotmark": "single",
+
+  "asi": true,
+  "boss": true,
+  "eqnull": true,
+  "es5": true,
+  "expr": true,
+
+  "node": true,
+  "jquery": true,
+  "browser": true,
+  "devel": true
+}

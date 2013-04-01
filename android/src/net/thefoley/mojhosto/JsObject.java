@@ -90,14 +90,14 @@ class JsObject {
         i++;
       }
       byteses[3] = Base64.decode(padding, Base64.DEFAULT);
-      new PrintByteList().execute(byteses);
+      //new PrintByteList().execute(byteses);
       return arr.toString();
     }
     
     Cursor cur = database.rawQuery(query, null);
-    if (cur.getCount() != 3) {
+    /*if (cur.getCount() != 3) {
       return "incorrect number of rows returned.";
-    }
+    }*/
     
     JSONArray ret = new JSONArray();
     while (cur.moveToNext()) {

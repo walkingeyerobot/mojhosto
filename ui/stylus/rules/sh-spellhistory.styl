@@ -1,0 +1,18 @@
+@import vars
+
+.sh-cnt
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  overflow: hidden
+  -webkit-perspective: 2000px
+
+.sh-card
+  position: absolute
+  left: 50%
+  top: 50%
+  margin-left: -($mtgCardWidth / 2)
+  margin-top: -($mtgCardHeight / 2)
+  -webkit-transform: translate3d(0, 0, 0)

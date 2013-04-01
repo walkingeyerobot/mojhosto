@@ -1,0 +1,97 @@
+@import anim
+@import vars
+
+.jh-coin
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 600px
+  height: 600px
+  margin-left: -(@width / 2)
+  margin-top: -(@height / 2)
+  -webkit-transform: rotate3d(0, 0, 1, 0)
+  -webkit-transition: -webkit-transform 0s $easeOutCubic
+
+.jh-coinFace, .jh-coinFlash
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+
+.jh-coinFace
+  background: url('/img/jhoira/coin3.png') no-repeat top left
+
+.jh-coinFlash
+  background: url('/img/jhoira/flash.png') no-repeat top left
+  opacity: 0
+  -webkit-transition: opacity 0s $easeOutCubic
+  -webkit-transform: translate3d(0,0,0)
+
+.jh-coinGlow
+  position: absolute
+  left: 0
+  top: 0
+  width: 186px
+  height: 186px
+  opacity: 0
+  background-image: url('/img/jhoira/glows2.png')
+  background-repeat: no-repeat
+  -webkit-transform: translate3d(0, 0, 0)
+  -webkit-transition: opacity 120ms $easeOutQuintic
+
+.jh-doors, .jh-carousel
+  position: absolute
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+
+.jh-leftDoor, .jh-rightDoor
+  box-sizing: border-box
+  -webkit-transition: -webkit-transform 1500ms $easeInOutQuad
+  -webkit-transform: translate3d(0, 0, 0)
+
+.jh-leftDoor
+  position: absolute
+  left: 0
+  top: 0
+  height: 100%
+  width: 50%
+  background: #333
+  border-right: 10px solid #666
+
+.jh-rightDoor
+  position: absolute
+  left: 50%
+  top: 0
+  height: 100%
+  width: 50%
+  background: #333
+  border-left: 10px solid #666
+
+.jh-doors, .jh-coin
+  display: block
+
+.jh-carousel
+  -webkit-perspective: 5000px
+  overflow: hidden
+
+.jh-card
+  position: absolute
+  left: 50%
+  top: 50%
+  margin-left: -($mtgCardWidth / 2)
+  margin-top: -($mtgCardHeight / 2)
+  -webkit-transform: translate3d(0, 0, 0)
+  -webkit-transition: -webkit-transform 0s $easeInCubic
+  z-index: 0
+
+.testCard0
+  background-image: url('/img/standin/sigarda.jpg')
+
+.testCard1
+  background-image: url('/img/standin/gisela.jpg')
+
+.testCard2
+  background-image: url('/img/standin/bruna.jpg')

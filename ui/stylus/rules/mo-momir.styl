@@ -1,0 +1,90 @@
+@import anim
+
+.ring-cnt
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 750px
+  height: 750px
+  margin-top: -(@height / 2)
+  margin-left: -(@width / 2)
+  background: url('/img/otherside2.png') no-repeat top left
+
+.ring
+  -webkit-transform: rotate3d(0, 0, 1, 0)
+  -webkit-transition: -webkit-transform 0ms $easeOutQuintic
+
+.ring, .ring-center, .ring-metal, .ring-glow, .ring-blur, .ring-flash
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+
+.ring-center
+  background: url('/img/ring_center_alt_2.png') no-repeat top left
+  opacity: 1
+  -webkit-transform: translate3d(0, 0, 0)
+  -webkit-transition: opacity 0ms $easeOutCubic
+
+.ring-nums
+  position: absolute
+  top: 0
+  left: 0
+  opacity: 0
+  background-image: url('/img/momir/glownums_crop.png')
+  background-repeat: no-repeat
+  width: 59px
+  height: 72px
+  -webkit-transform: translate3d(0, 0, 0)
+  -webkit-transition: opacity 220ms $easeOutQuintic
+
+.ring-metal
+  background: url('/img/ring_metal.png') no-repeat top left
+  opacity: 1
+  -webkit-transform: translate3d(0, 0, 0)
+
+.ring-glow
+  background: url('/img/ring_glow_yellow.png') no-repeat top left
+  opacity: 0
+  -webkit-transform: translate3d(0, 0, 0)
+  -webkit-transition: opacity 100ms $easeOutCubic
+
+.ring-blur
+  background: url('/img/ring_blur_gold.png') no-repeat top left
+  opacity: 0
+  -webkit-transform: translate3d(0, 0, 0)
+  -webkit-transition: opacity 0ms $easeOutCubic
+
+.ring-flash
+  background: url('/img/ring_flash.png') no-repeat top left
+  opacity: 0
+  -webkit-transform: translate3d(0, 0, 0)
+  -webkit-transition: opacity 0ms $easeOutCubic
+
+.mo-equipBtn, .mo-cancelBtn, .mo-continueBtn
+  position: absolute
+  width: 145px
+  height: 145px
+  margin-left: -(@width / 2)
+  margin-top: -(@height / 2)
+  opacity: 0
+  -webkit-transform: translate3d(0,0,0)
+  -webkit-transition: opacity 300ms $easeOutCubic
+
+.mo-equipBtn
+  position: absolute
+  bottom: 15px
+  left: 135px
+  opacity: 1
+  background: url('/img/momir/equip_btn.png') no-repeat
+
+.mo-cancelBtn
+  left: 150px
+  top: 50%
+  background: url('/img/momir/float_cancel.png') no-repeat
+
+.mo-continueBtn
+  right: 75px
+  top: 50%
+  background: url('/img/momir/float_equip.png') no-repeat
